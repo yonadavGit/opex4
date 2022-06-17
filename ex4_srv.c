@@ -17,8 +17,22 @@
 #include <sys/wait.h>
 
 
+void alarmHandler(int signum) {
+
+        printf("%s\n", "The server was closed because no service request was received for the last 60 seconds");
+        exit(-1);
+    }
+
+
+
+
+
 void handleClient(int num) {
     signal(SIGUSR2, handleClient);
+    alarm(0);
+
+
+
     int pid_compute, status;
     /**********INSIDE THE FORK**********/
     if (pid_compute = fork() == 0) { /*Creat a procces for the compute*/
@@ -65,6 +79,10 @@ void handleClient(int num) {
         int P4_i = temp;
         /**********CALCULATE**********/
         int result;
+        if (P4_i == 0 && P3_i==4) {
+            printf("CANNOT_DIVIDE_BY_0\n");
+            exit(-1);
+        }
         if (P3_i == 1) {
             result = P2_i + P4_i;
         }
@@ -90,7 +108,7 @@ void handleClient(int num) {
             dup2(fd_to_client, 1);
             printf("%d\n", result);
         //}
-        waitpid(pid_compute, &status, NULL);
+        //waitpid(pid_compute, &status, 0);
         close(fd_to_client);
         kill(client_pid_i, SIGUSR1); /*Send a signal to the client we are done*/
         exit(0);
@@ -99,6 +117,8 @@ void handleClient(int num) {
     else {
         signal(SIGCHLD, SIG_IGN); /*Prevent zombies*/
     }
+
+
 }
 
 int main(int argc, char *argv[]) {
@@ -108,8 +128,10 @@ int main(int argc, char *argv[]) {
         remove("to_srv.txt");
 
     }
+    signal(SIGALRM, alarmHandler);
 
     while (1) { /*Waiting to signals from clients*/
+        alarm(60);
         signal(SIGUSR1, handleClient); /*Signal registration*/
         printf("%d\n", getpid());
         pause();
