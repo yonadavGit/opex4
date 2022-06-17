@@ -1,0 +1,3 @@
+/home/yonadav/opex4/cmake-build-debug/CMakeFiles/opex4.dir
+/home/yonadav/opex4/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/yonadav/opex4/cmake-build-debug/CMakeFiles/rebuild_cache.dir
