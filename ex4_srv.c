@@ -113,8 +113,9 @@ void handleClient(int num) {
                 perror("open");
                 exit(1);
             }
-            dup2(fd_to_client, 1);
+            //dup2(fd_to_client, 1);
             printf("%s\n", "CANNOT_DIVIDE_BY_ZERO");
+            write(fd_to_client, "CANNOT_DIVIDE_BY_ZERO\n", strlen("CANNOT_DIVIDE_BY_ZERO\n"));
             //}
             //waitpid(pid_compute, &status, 0);
             close(fd_to_client);
