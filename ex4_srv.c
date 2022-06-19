@@ -81,6 +81,7 @@ void handleClient(int num) {
         char *P2_c = strtok(NULL, "\n");
         char *P3_c = strtok(NULL, "\n");
         char *P4_c = strtok(NULL, "\n");
+
         /**********CASTING**********/
         intmax_t xmax;
         char *tmp;

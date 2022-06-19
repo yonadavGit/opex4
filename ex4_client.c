@@ -53,9 +53,11 @@ void responseHandler(int signum) {
         answer[i] = current;
         i++;
     }
-    if(!isdigit(answer[i])){
+    answer[i] = '\0';
+
+    /*if(!isdigit(answer[i])){
         answer[i] = '\0';
-    }
+    }*/
     printf("%s", answer);
     close(responseFD);
     remove(fileName);
