@@ -5,6 +5,7 @@
 #include <fcntl.h>
 #include <sys/wait.h>
 #include <string.h>
+#include <ctype.h>
 
 #define CHAIMON_ERROR "ERROR_FROM_EX4\n"
 
@@ -12,13 +13,23 @@ int fd_to_srv = 0;
 int got_response = 0;
 pid_t client_pid = 0;
 char client_pid_string[50];
+char response_pid_file_name[50];
+
 
 
 void alarmHandler(int signum) {
     if (!got_response) {
         printf("%s", "Client closed because no response was received");
         close(fd_to_srv);
+
     }
+    char fileName[100] = "to_client_";
+    strcat(fileName, client_pid_string);
+    strcat(fileName, ".txt");
+    if (access(fileName, F_OK) == 0) { /*If it exsist*/
+        remove(fileName);
+    }
+    exit(-1);
 }
 
 void responseHandler(int signum) {
@@ -42,7 +53,10 @@ void responseHandler(int signum) {
         answer[i] = current;
         i++;
     }
-    printf(answer);
+    if(!isdigit(answer[i])){
+        answer[i] = '\0';
+    }
+    printf("%s", answer);
     close(responseFD);
     remove(fileName);
     exit(0);
@@ -51,7 +65,13 @@ void responseHandler(int signum) {
 
 
 int main(int argc, char **argv) {
-    printf("Hello, World!\n");
+    /***********Validate Input*****/
+    if (argc != 5) {
+        printf("%s", CHAIMON_ERROR);
+        exit(-1);
+    }
+
+    //printf("Hello, World!\n");
     char *serverPid = argv[1];
     char *firstParam = argv[2];
     char *operator = argv[3];
@@ -59,7 +79,7 @@ int main(int argc, char **argv) {
 
     /*************************************/
     int temp;
-    sscanf(serverPid,"%d", &temp); /*Casting from string to int*/
+    sscanf(serverPid, "%d", &temp); /*Casting from string to int*/
     pid_t srv_pid = temp; /*Server pid*/
     client_pid = getpid(); /*Client pid*/
 
@@ -95,6 +115,7 @@ int main(int argc, char **argv) {
     write(fd_to_srv, operator, strlen(operator));
     write(fd_to_srv, "\n", 1);
     write(fd_to_srv, secondParam, strlen(secondParam));
+
     close(fd_to_srv);
     signal(SIGALRM, alarmHandler);
     signal(SIGUSR1, responseHandler);

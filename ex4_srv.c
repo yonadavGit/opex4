@@ -19,16 +19,17 @@
 
 void alarmHandler(int signum) {
 
-        printf("%s\n", "The server was closed because no service request was received for the last 60 seconds");
-        exit(-1);
-    }
+    printf("%s\n", "The server was closed because no service request was received for the last 60 seconds");
+    while(wait(NULL) != -1);
+    exit(-1);
+}
 
 
 
 
 
 void handleClient(int num) {
-    signal(SIGUSR2, handleClient);
+    signal(SIGUSR1, handleClient);
     alarm(0);
 
 
@@ -80,8 +81,23 @@ void handleClient(int num) {
         /**********CALCULATE**********/
         int result;
         if (P4_i == 0 && P3_i==4) {
-            printf("CANNOT_DIVIDE_BY_0\n");
-            exit(-1);
+            //printf("CANNOT_DIVIDE_BY_0\n");
+            //exit(1);
+            char str[100] = "to_client_";
+            strcat(str, client_pid_c);
+            strcat(str, ".txt");
+            int fd_to_client = open(str, O_RDWR | O_CREAT | O_APPEND, 0666); /*Open fd for to_client_xxxx file*/
+            if (fd_to_client == -1) {
+                perror("open");
+                exit(1);
+            }
+            dup2(fd_to_client, 1);
+            printf("%s\n", "CANNOT_DIVIDE_BY_ZERO");
+            //}
+            //waitpid(pid_compute, &status, 0);
+            close(fd_to_client);
+            kill(client_pid_i, SIGUSR1); /*Send a signal to the client we are done*/
+            exit(0);
         }
         if (P3_i == 1) {
             result = P2_i + P4_i;
@@ -105,8 +121,8 @@ void handleClient(int num) {
             exit(1);
         }
         //if (pid_compute = fork() == 0) { /*Creat a procces*/
-            dup2(fd_to_client, 1);
-            printf("%d\n", result);
+        dup2(fd_to_client, 1);
+        printf("%d\n", result);
         //}
         //waitpid(pid_compute, &status, 0);
         close(fd_to_client);
@@ -131,9 +147,9 @@ int main(int argc, char *argv[]) {
     signal(SIGALRM, alarmHandler);
 
     while (1) { /*Waiting to signals from clients*/
-        alarm(60);
         signal(SIGUSR1, handleClient); /*Signal registration*/
-        printf("%d\n", getpid());
+        alarm(60);
+        //printf("%d\n", getpid());
         pause();
     }
     exit(0);
