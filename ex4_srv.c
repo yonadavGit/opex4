@@ -15,24 +15,45 @@
 #include <iso646.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <stdio.h>
+#include <dirent.h>
+#include <unistd.h>
 
+int startsWith(const char *a, const char *b)
+{
+    if(strncmp(a, b, strlen(b)) == 0) return 1;
+    return 0;
+}
+void removeFiles() {
+    char pwd[1024];
+    getcwd(pwd, sizeof(pwd));
+    DIR* dp = opendir(pwd);
+    if (dp == NULL) {
+        perror("opendir: Path does not exist or could not be read.");
+        return;
+    }
 
-void alarmHandler(int signum) {
+    struct dirent* entry;
+    while ((entry = readdir(dp))) {
+        if(startsWith(entry->d_name, "to_client"))
+            remove(entry->d_name);
+    }
 
-    printf("%s\n", "The server was closed because no service request was received for the last 60 seconds");
-    while(wait(NULL) != -1);
-    exit(-1);
+    closedir(dp);
+    return;
 }
 
-
-
-
+void alarmHandler(int signum) {
+    printf("%s\n", "The server was closed because no service request was received for the last 60 seconds");
+    alarm(0);
+    while(wait(NULL) != -1);
+    removeFiles();
+    exit(-1);
+}
 
 void handleClient(int num) {
     signal(SIGUSR1, handleClient);
     alarm(0);
-
-
 
     int pid_compute, status;
     /**********INSIDE THE FORK**********/
