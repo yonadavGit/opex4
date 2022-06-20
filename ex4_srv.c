@@ -76,13 +76,13 @@ void handleClient(int num) {
         }
         waitpid(pid_compute,&status,NULL);*/
         remove("to_srv.txt");
-        /**********SPLIT THE BUFFER**********/
+        /**********Read Buffer**********/
         char *client_pid_c = strtok(to_srv_buf, "\n");
-        char *P2_c = strtok(NULL, "\n");
-        char *P3_c = strtok(NULL, "\n");
-        char *P4_c = strtok(NULL, "\n");
+        char *firstArgument = strtok(NULL, "\n");
+        char *operator = strtok(NULL, "\n");
+        char *secondArgument = strtok(NULL, "\n");
 
-        /**********CASTING**********/
+        /*************************/
         intmax_t xmax;
         char *tmp;
         pid_t client_pid_i;
@@ -94,17 +94,16 @@ void handleClient(int num) {
             client_pid_i = (pid_t) xmax;
         }
         int temp;
-        sscanf(P2_c, "%d", &temp);
-        int P2_i = temp;
-        sscanf(P3_c, "%d", &temp);
-        int P3_i = temp;
-        sscanf(P4_c, "%d", &temp);
-        int P4_i = temp;
-        /**********CALCULATE**********/
+        sscanf(firstArgument, "%d", &temp);
+        int firstArgumentInt = temp;
+        sscanf(operator, "%d", &temp);
+        int operatorInt = temp;
+        sscanf(secondArgument, "%d", &temp);
+        int secondArgumentInt = temp;
+        /**********Arithmetic**********/
         int result;
-        if (P4_i == 0 && P3_i==4) {
-            //printf("CANNOT_DIVIDE_BY_0\n");
-            //exit(1);
+        if (secondArgumentInt == 0 && operatorInt == 4) {
+
             char str[100] = "to_client_";
             strcat(str, client_pid_c);
             strcat(str, ".txt");
@@ -113,26 +112,24 @@ void handleClient(int num) {
                 perror("open");
                 exit(1);
             }
-            //dup2(fd_to_client, 1);
             printf("%s\n", "CANNOT_DIVIDE_BY_ZERO");
             write(fd_to_client, "CANNOT_DIVIDE_BY_ZERO\n", strlen("CANNOT_DIVIDE_BY_ZERO\n"));
-            //}
-            //waitpid(pid_compute, &status, 0);
+
             close(fd_to_client);
             kill(client_pid_i, SIGUSR1); /*Send a signal to the client we are done*/
             exit(0);
         }
-        if (P3_i == 1) {
-            result = P2_i + P4_i;
+        if (operatorInt == 1) {
+            result = firstArgumentInt + secondArgumentInt;
         }
-        if (P3_i == 2) {
-            result = P2_i - P4_i;
+        if (operatorInt == 2) {
+            result = firstArgumentInt - secondArgumentInt;
         }
-        if (P3_i == 3) {
-            result = P2_i * P4_i;
+        if (operatorInt == 3) {
+            result = firstArgumentInt * secondArgumentInt;
         }
-        if (P3_i == 4) {
-            result = P2_i / P4_i;
+        if (operatorInt == 4) {
+            result = firstArgumentInt / secondArgumentInt;
         }
         /**********OPEN to_client_xxxx FILE**********/
         char str[100] = "to_client_";
@@ -144,17 +141,23 @@ void handleClient(int num) {
             exit(1);
         }
         //if (pid_compute = fork() == 0) { /*Creat a procces*/
-        dup2(fd_to_client, 1);
-        printf("%d\n", result);
+
+        //dup2(fd_to_client, 1);
+        //printf("%d\n", result);
+        char resultString[100];
+        sprintf(resultString, "%d", result);
+        write(fd_to_client,resultString, strlen(resultString));
+        write(fd_to_client,"\n", 1);
+
         //}
         //waitpid(pid_compute, &status, 0);
         close(fd_to_client);
-        kill(client_pid_i, SIGUSR1); /*Send a signal to the client we are done*/
+        kill(client_pid_i, SIGUSR1);
         exit(0);
     }
-        /***********************************/
+        /***************************************************************************************************/
     else {
-        signal(SIGCHLD, SIG_IGN); /*Prevent zombies*/
+        signal(SIGCHLD, SIG_IGN); /*Zombie Apocalypse Prevention*/
     }
 
 

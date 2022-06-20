@@ -49,8 +49,8 @@ cmake_ninja_workdir = /home/yonadav/opex4/cmake-build-debug/
 
 build cmake_object_order_depends_target_opex4: phony || CMakeFiles/opex4.dir
 
-build CMakeFiles/opex4.dir/ex4_client.c.o: C_COMPILER__opex4_Debug /home/yonadav/opex4/ex4_client.c || cmake_object_order_depends_target_opex4
-  DEP_FILE = CMakeFiles/opex4.dir/ex4_client.c.o.d
+build CMakeFiles/opex4.dir/ex4_srv.c.o: C_COMPILER__opex4_Debug /home/yonadav/opex4/ex4_srv.c || cmake_object_order_depends_target_opex4
+  DEP_FILE = CMakeFiles/opex4.dir/ex4_srv.c.o.d
   FLAGS = -g -std=gnu11
   OBJECT_DIR = CMakeFiles/opex4.dir
   OBJECT_FILE_DIR = CMakeFiles/opex4.dir
@@ -63,7 +63,7 @@ build CMakeFiles/opex4.dir/ex4_client.c.o: C_COMPILER__opex4_Debug /home/yonadav
 #############################################
 # Link the executable opex4
 
-build opex4: C_EXECUTABLE_LINKER__opex4_Debug CMakeFiles/opex4.dir/ex4_client.c.o
+build opex4: C_EXECUTABLE_LINKER__opex4_Debug CMakeFiles/opex4.dir/ex4_srv.c.o
   FLAGS = -g
   OBJECT_DIR = CMakeFiles/opex4.dir
   POST_BUILD = :
