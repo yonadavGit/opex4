@@ -1,23 +1,15 @@
-//
-// Created by yonadav on 6/16/22.
-//
+//Yonadav Leibowitz 207424490
 #include <stdio.h>
 #include <sys/fcntl.h>
 #include <errno.h>
-#include <sys/types.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <sys/stat.h>
-#include <time.h>
 #include <signal.h>
 #include <inttypes.h>
 #include <iso646.h>
-#include <sys/types.h>
 #include <sys/wait.h>
-#include <stdio.h>
 #include <dirent.h>
-#include <unistd.h>
 
 int startsWith(const char *a, const char *b)
 {
@@ -71,10 +63,7 @@ void handleClient(int num) {
         }
         close(fd_to_srv);
 
-        /*if(pid_compute=fork()==0){ *//*Creat grandson*//*
-            execl("/bin/rm","rm","to_srv.txt",NULL); *//*Delete the file as soon as possible*//*
-        }
-        waitpid(pid_compute,&status,NULL);*/
+
         remove("to_srv.txt");
         /**********Read Buffer**********/
         char *client_pid_c = strtok(to_srv_buf, "\n");
@@ -140,7 +129,6 @@ void handleClient(int num) {
             perror("open");
             exit(1);
         }
-        //if (pid_compute = fork() == 0) { /*Creat a procces*/
 
         //dup2(fd_to_client, 1);
         //printf("%d\n", result);
@@ -165,14 +153,13 @@ void handleClient(int num) {
 
 int main(int argc, char *argv[]) {
 
-    /**********DELETE to_srv IF IT EXSIST**********/
-    if (access("to_srv.txt", F_OK) == 0) { /*If it exsist*/
+    if (access("to_srv.txt", F_OK) == 0) {
         remove("to_srv.txt");
 
     }
     signal(SIGALRM, alarmHandler);
 
-    while (1) { /*Waiting to signals from clients*/
+    while (1) {
         signal(SIGUSR1, handleClient); /*Signal registration*/
         alarm(60);
         //printf("%d\n", getpid());

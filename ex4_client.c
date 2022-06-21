@@ -1,3 +1,6 @@
+//Yonadav Leibowitz 207424490
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -105,7 +108,6 @@ int main(int argc, char **argv) {
         close(fd_to_srv);
         exit(1);
     }
-    /****OPEN to_srv.txt & WRITE TO IT****/
     sprintf(client_pid_string, "%d", client_pid);
     int pid, status;
     //dup2(fd_to_srv,1);
@@ -121,7 +123,7 @@ int main(int argc, char **argv) {
     close(fd_to_srv);
     signal(SIGALRM, alarmHandler);
     signal(SIGUSR1, responseHandler);
-    if (kill(srv_pid, SIGUSR1) == -1) { /*Send a signal to to server we are done*/
+    if (kill(srv_pid, SIGUSR1) == -1) { /*Send a signal to server*/
         printf("ERROR: There is no such pid\n");
         close(fd_to_srv);
         exit(1);
@@ -129,7 +131,7 @@ int main(int argc, char **argv) {
     alarm(30);
 
     while (1) {
-        pause(); /*Waiting to answer from the server*/
+        pause();
     }
 
 
